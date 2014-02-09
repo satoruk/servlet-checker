@@ -21,12 +21,34 @@ public class ServletChecker implements SparkApplication {
       @Override
       public Object handle(Request request, Response response) {
         Date date1 = new Date();
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mmZ");
-        System.out.println(sdf1.format(date1));
+        SimpleDateFormat sdf1 = new SimpleDateFormat();
         sdf1.applyPattern("yyyy-MM-dd HH:mmZ");
-
-        response.type("text/xml");
+        response.type("text/plain");
         return sdf1.format(date1);
+      }
+    });
+
+    Spark.get(new Route("/info.txt") {
+      @Override
+      public Object handle(Request request, Response response) {
+        response.type("text/plain");
+        StringBuilder sb = new StringBuilder();
+
+        Date date1 = new Date();
+        SimpleDateFormat sdf1 = new SimpleDateFormat();
+        sdf1.applyPattern("yyyy-MM-dd HH:mmZ");
+        sb.append(sdf1.format(date1));
+        sb.append("\n");
+
+        sb.append("[HEADERS]\n");
+        for (String name : request.headers()) {
+          sb.append(name);
+          sb.append(":");
+          sb.append(request.headers(name));
+          sb.append("\n");
+        }
+
+        return sb;
       }
     });
 
@@ -48,10 +70,12 @@ public class ServletChecker implements SparkApplication {
     Spark.get(new Route("/hello/:name") {
       @Override
       public Object handle(Request request, Response response) {
+        response.type("text/plain");
         String name = getBaseName(request.params(":name"));
         String ext = getExtension(request.params(":name"));
         return  String.format("Hello1, %s! [%s]", name, ext);
       }
     });
+
   }
 }
